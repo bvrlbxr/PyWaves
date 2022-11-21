@@ -24,18 +24,24 @@ class Contract(object):
         parameterList = ''
         callParameters = 'parameters = [\n'
 
-        for parameter in parameters.keys():
-            parameterList += parameter + ', '
-            type = parameters[parameter]
+        for parameter in parameters:  # doesn't work with keys in vires contract
+
+            if parameter["name"] == "from":  # patch for keyword from in claimProtocolProfitFrom in vires contract
+                par_name = "from_1"
+            else:
+                par_name = parameter["name"]
+
+            parameterList += par_name + ', '
+            type = parameter["type"]
 
             if type == 'Int':
-                callParameters += '\t\t{ "type": "integer", "value": ' + parameter + ' },\n'
+                callParameters += '\t\t{ "type": "integer", "value": ' + par_name + ' },\n'
             elif type == 'String':
-                callParameters += '\t\t{ "type": "string", "value": ' + parameter + ' },\n'
+                callParameters += '\t\t{ "type": "string", "value": ' + par_name + ' },\n'
             elif type == 'Boolean':
-                callParameters += '\t\t{ "type": "boolean", "value": ' + parameter + ' },\n'
+                callParameters += '\t\t{ "type": "boolean", "value": ' + par_name + ' },\n'
 
-        if len(parameters.keys()) > 0:
+        if len(parameters) > 0:
             callParameters = callParameters[0:len(callParameters) - 2] + '\n'
         callParameters += '\t]'
         call = 'return pw.Address(seed = \'' + seed + '\').invokeScript(\'' + self.contractAddress + '\', \'' + method + '\', parameters, [])'
